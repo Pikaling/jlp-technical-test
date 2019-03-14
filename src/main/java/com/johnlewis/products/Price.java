@@ -37,11 +37,6 @@ public class Price {
         return then2;
     }
 
-    //TODO: now price can be either format:
-    //"now":"50.00"
-    //"now":{"from":"55.00","to":"100.00"}
-    //those with a price range are not discounted, so can ignore?
-
     public void setNow(Object nowPriceObject) {
         String nowPriceString = nowPriceObject.toString();
         try {

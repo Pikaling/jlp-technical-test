@@ -1,6 +1,7 @@
 package com.johnlewis.discountedProducts;
 
 import com.johnlewis.products.Product;
+import com.johnlewis.products.ProductBuilder;
 import com.johnlewis.products.ProductsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,26 +28,23 @@ public class DiscountedProductsControllerTest {
     @Autowired
     private DiscountedProductsController controller;
     private List<Product> testProducts;
-    private ProductBuilder productBuilder;
+    private ProductBuilder builder = new ProductBuilder();
 
     @Before
     public void setUp() {
         testProducts = new ArrayList<>();
-        productBuilder = new ProductBuilder();
     }
 
     @Test
     public void shouldGetDiscountedProducts() {
-        testProducts.add(productBuilder.build());
-        testProducts.add(productBuilder.withWasPrice(20.00).build());
+        testProducts.add(builder.build());
+        testProducts.add(builder.withWasPrice(20.00).build());
 
         when(mockProductsService.getProducts()).thenReturn(testProducts);
 
-        List<Product> discountedProducts = controller.getProducts();
+        List<DiscountedProduct> discountedProducts = controller.getProducts();
         assertThat(discountedProducts).isNotNull();
         assertThat(discountedProducts.size()).isEqualTo(1);
-
-
     }
 
 }

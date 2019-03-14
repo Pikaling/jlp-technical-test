@@ -17,13 +17,16 @@ public class DiscountedProductsController {
     @Autowired
     private ProductsService productsService;
 
+    @Autowired
+    private ProductMapper productMapper;
+
     @RequestMapping(value="/products", method=GET)
-    public List<Product> getProducts() {
+    public List<DiscountedProduct> getProducts() {
         List<Product> products = productsService.getProducts();
-        List<Product> discountedProducts = new ArrayList<>();
+        List<DiscountedProduct> discountedProducts = new ArrayList<>();
         for (Product product : products) {
             if (product.getPrice().getWas() != null ) {
-                discountedProducts.add(product);
+                discountedProducts.add(productMapper.toDiscountedProduct(product));
             }
         }
         return discountedProducts;

@@ -1,11 +1,10 @@
-package com.johnlewis.discountedProducts;
+package com.johnlewis.products;
 
-import com.johnlewis.products.Price;
-import com.johnlewis.products.Product;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class ProductBuilder {
@@ -15,6 +14,7 @@ public class ProductBuilder {
     private String title;
     private Object now;
     private BigDecimal was;
+    private List<ColorSwatch> colorSwatches = new ArrayList<>();
     private String currency = DEFAULT_CURRENCY;
 
     public ProductBuilder() {
@@ -22,6 +22,15 @@ public class ProductBuilder {
 
     public ProductBuilder withWasPrice(double price) {
         this.was = new BigDecimal(price);
+        return this;
+    }
+
+    public ProductBuilder withColorSwatch(String basicColor) {
+        ColorSwatch colorSwatch = new ColorSwatch();
+        colorSwatch.setColor(RandomStringUtils.randomAlphabetic(8));
+        colorSwatch.setBasicColor(basicColor);
+        colorSwatch.setSkuId(RandomStringUtils.randomNumeric(9));
+        this.colorSwatches.add(colorSwatch);
         return this;
     }
 
@@ -41,7 +50,7 @@ public class ProductBuilder {
 
         product.setProductId(productId);
         product.setTitle(title);
-        product.setColorSwatches(new ArrayList<>());
+        product.setColorSwatches(colorSwatches);
         product.setPrice(price);
 
         this.clean();
@@ -55,5 +64,6 @@ public class ProductBuilder {
         this.currency = DEFAULT_CURRENCY;
         this.was = null;
         this.now = null;
+        this.colorSwatches = new ArrayList<>();
     }
 }

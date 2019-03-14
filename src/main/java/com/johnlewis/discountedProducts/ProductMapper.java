@@ -3,10 +3,8 @@ package com.johnlewis.discountedProducts;
 import com.johnlewis.products.Product;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Component
 class ProductMapper {
@@ -31,7 +29,18 @@ class ProductMapper {
         discountedProduct.setProductId(product.getProductId());
         discountedProduct.setTitle(product.getTitle());
         discountedProduct.setColorSwatches(mapColorSwatches(product.getColorSwatches()));
+        discountedProduct.setNowPrice(generatePriceString(product.getPrice().getNow(), product.getPrice().getCurrency()));
+
         return discountedProduct;
+    }
+
+    private String generatePriceString(BigDecimal price, String currencyString) {
+        String priceString = price.toString();
+        if (price.compareTo(BigDecimal.TEN) >= 0 && price.stripTrailingZeros().scale() <=0) {
+            priceString = Integer.toString(price.intValue());
+        }
+        Currency currency = Currency.getInstance(currencyString);
+        return currency.getSymbol() + priceString;
     }
 
     private List<ColorSwatch> mapColorSwatches(List<com.johnlewis.products.ColorSwatch> inputColorSwatches) {

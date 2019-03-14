@@ -20,17 +20,22 @@ public class ProductBuilder {
     public ProductBuilder() {
     }
 
-    public ProductBuilder withWasPrice(double price) {
-        this.was = new BigDecimal(price);
-        return this;
-    }
-
     public ProductBuilder withColorSwatch(String basicColor) {
         ColorSwatch colorSwatch = new ColorSwatch();
         colorSwatch.setColor(RandomStringUtils.randomAlphabetic(8));
         colorSwatch.setBasicColor(basicColor);
         colorSwatch.setSkuId(RandomStringUtils.randomNumeric(9));
         this.colorSwatches.add(colorSwatch);
+        return this;
+    }
+
+    public ProductBuilder withNowPrice(String priceString) {
+        this.now = priceString;
+        return this;
+    }
+
+    public ProductBuilder withWasPrice(double price) {
+        this.was = new BigDecimal(price);
         return this;
     }
 

@@ -18,7 +18,7 @@ public class DiscountedProductsController {
     private ProductsService productsService;
 
     @RequestMapping(value="/products", method=GET)
-    public void getProducts() {
+    public List<Product> getProducts() {
         List<Product> products = productsService.getProducts();
         List<Product> discountedProducts = new ArrayList<>();
         for (Product product : products) {
@@ -26,6 +26,6 @@ public class DiscountedProductsController {
                 discountedProducts.add(product);
             }
         }
-        System.out.println("Total products: " + products.size() + ", Discounted products: " + discountedProducts.size());
+        return discountedProducts;
     }
 }

@@ -10,25 +10,20 @@ import java.util.Random;
 
 public class ProductBuilder {
 
+    public static final String DEFAULT_CURRENCY = "GBP";
     private String productId;
     private String title;
     private Object now;
     private BigDecimal was;
-    private String currency = "GBP";
+    private String currency = DEFAULT_CURRENCY;
 
     public ProductBuilder() {
     }
 
-    public ProductBuilder withNowPrice(Object nowPrice) {
-        this.now = nowPrice;
+    public ProductBuilder withWasPrice(double price) {
+        this.was = new BigDecimal(price);
         return this;
     }
-
-    public ProductBuilder withWasPrice(BigDecimal wasPrice) {
-        this.was = wasPrice;
-        return this;
-    }
-
 
     public Product build() {
         Product product = new Product();
@@ -49,9 +44,16 @@ public class ProductBuilder {
         product.setColorSwatches(new ArrayList<>());
         product.setPrice(price);
 
+        this.clean();
+
         return product;
     }
 
-
-
+    private void clean() {
+        this.productId = null;
+        this.title = null;
+        this.currency = DEFAULT_CURRENCY;
+        this.was = null;
+        this.now = null;
+    }
 }

@@ -43,11 +43,12 @@ public class Price {
     //those with a price range are not discounted, so can ignore?
 
     public void setNow(Object nowPriceObject) {
+        String nowPriceString = nowPriceObject.toString();
         try {
-            double price = Double.parseDouble(nowPriceObject.toString());
-            now = BigDecimal.valueOf(price);
+            Double.parseDouble(nowPriceString);
+            now = new BigDecimal(nowPriceString);
         } catch (NumberFormatException e) {
-            System.out.println("Unknown price format:" + nowPriceObject);
+            System.out.println("Unknown price format:" + nowPriceString);
         }
     }
     public BigDecimal getNow() {

@@ -1,5 +1,6 @@
 package com.johnlewis.discountedProducts;
 
+import com.johnlewis.products.Price;
 import com.johnlewis.products.Product;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +9,8 @@ import java.util.*;
 
 @Component
 class ProductMapper {
+
+    public static final String DEFAULT_LABEL_TYPE = "ShowWasNow";
 
     private static final Map<String, String> basicToRgb = new HashMap<>();
 
@@ -24,23 +27,18 @@ class ProductMapper {
         basicToRgb.put("Yellow", "FFFF00");
     }
 
-    public DiscountedProduct toDiscountedProduct(Product product) {
+    private String currencySymbol;
+
+    public DiscountedProduct toDiscountedProduct(Product product, String labelType) {
+        currencySymbol = Currency.getInstance(product.getPrice().getCurrency()).getSymbol();
+        labelType = labelType == null ? DEFAULT_LABEL_TYPE : labelType;
         DiscountedProduct discountedProduct = new DiscountedProduct();
         discountedProduct.setProductId(product.getProductId());
         discountedProduct.setTitle(product.getTitle());
         discountedProduct.setColorSwatches(mapColorSwatches(product.getColorSwatches()));
-        discountedProduct.setNowPrice(generatePriceString(product.getPrice().getNow(), product.getPrice().getCurrency()));
-
+        discountedProduct.setNowPrice(generatePriceString(product.getPrice().getNow()));
+        discountedProduct.setPriceLabel(generatePriceLabel(product.getPrice(), discountedProduct.getNowPrice(), labelType));
         return discountedProduct;
-    }
-
-    private String generatePriceString(BigDecimal price, String currencyString) {
-        String priceString = price.toString();
-        if (price.compareTo(BigDecimal.TEN) >= 0 && price.stripTrailingZeros().scale() <=0) {
-            priceString = Integer.toString(price.intValue());
-        }
-        Currency currency = Currency.getInstance(currencyString);
-        return currency.getSymbol() + priceString;
     }
 
     private List<ColorSwatch> mapColorSwatches(List<com.johnlewis.products.ColorSwatch> inputColorSwatches) {
@@ -53,6 +51,55 @@ class ProductMapper {
             outputColorSwatches.add(outputColorSwatch);
         }
         return outputColorSwatches;
+    }
+
+    private String generatePriceString(BigDecimal price) {
+        String priceString = price.toString();
+        if (price.compareTo(BigDecimal.TEN) >= 0) {
+            priceString = removeDecimalsFromIntegerValue(price);
+        }
+        return currencySymbol + priceString;
+    }
+
+    private String generatePriceLabel(Price price, String nowPrice, String labelType) {
+        String priceLabel = null;
+        switch (labelType) {
+            case "ShowWasNow":
+                priceLabel = getShowWasNowLabel(price, nowPrice);
+                break;
+            case "ShowWasThenNow":
+                BigDecimal thenPrice = price.getThen2() != null ? price.getThen2() : price.getThen1();
+                if (thenPrice != null) {
+                    priceLabel = getShowWasThenNowLabel(price, nowPrice, thenPrice);
+                } else {
+                    priceLabel = getShowWasNowLabel(price, nowPrice);
+                }
+                break;
+            case "ShowPercDiscount":
+                BigDecimal percentDiscount = getPercentDiscount(price);
+                priceLabel = String.format("%s%% off - now %s", removeDecimalsFromIntegerValue(percentDiscount), nowPrice);
+        }
+        return priceLabel;
+    }
+
+    private String removeDecimalsFromIntegerValue(BigDecimal decimal) {
+        String decimalString = decimal.toString();
+        if (decimal.stripTrailingZeros().scale() <= 0) {
+            decimalString = Integer.toString(decimal.intValue());
+        }
+        return decimalString;
+    }
+
+    private String getShowWasNowLabel(Price price, String nowPrice) {
+        return String.format("Was %s, now %s", generatePriceString(price.getWas()), nowPrice);
+    }
+
+    private String getShowWasThenNowLabel(Price price, String nowPrice, BigDecimal thenPrice) {
+        return String.format("Was %s, then %s, now %s", generatePriceString(price.getWas()), generatePriceString(thenPrice), nowPrice);
+    }
+
+    private BigDecimal getPercentDiscount(Price price) {
+        return (price.getWas().subtract(price.getNow())).divide(price.getWas()).multiply(BigDecimal.valueOf(100));
     }
 
 }

@@ -12,10 +12,9 @@ public class ProductBuilder {
     public static final String DEFAULT_CURRENCY = "GBP";
     private String productId;
     private String title;
-    private Object now;
-    private BigDecimal was;
     private List<ColorSwatch> colorSwatches = new ArrayList<>();
     private String currency = DEFAULT_CURRENCY;
+    private Price price = new Price();
 
     public ProductBuilder() {
     }
@@ -30,29 +29,32 @@ public class ProductBuilder {
     }
 
     public ProductBuilder withNowPrice(String priceString) {
-        this.now = priceString;
+        price.setNow(priceString);
         return this;
     }
 
-    public ProductBuilder withWasPrice(double price) {
-        this.was = new BigDecimal(price);
+    public ProductBuilder withWasPrice(double wasPrice) {
+        price.setWas(new BigDecimal(wasPrice));
+        return this;
+    }
+
+    public ProductBuilder withPrice(Price price) {
+        this.price = price;
         return this;
     }
 
     public Product build() {
-        Product product = new Product();
-
         Random random = new Random();
 
         productId = productId == null ? RandomStringUtils.randomNumeric(7) : productId;
         title = title == null ? RandomStringUtils.randomPrint(100) : title;
-        now = now == null ? random.nextDouble() : now;
-
-        Price price = new Price();
         price.setCurrency(currency);
-        price.setNow(now);
-        price.setWas(was);
 
+        if (price.getNow() == null) {
+            price.setNow(RandomStringUtils.randomNumeric(2));
+        }
+
+        Product product = new Product();
         product.setProductId(productId);
         product.setTitle(title);
         product.setColorSwatches(colorSwatches);
@@ -67,8 +69,7 @@ public class ProductBuilder {
         this.productId = null;
         this.title = null;
         this.currency = DEFAULT_CURRENCY;
-        this.was = null;
-        this.now = null;
         this.colorSwatches = new ArrayList<>();
+        this.price = new Price();
     }
 }

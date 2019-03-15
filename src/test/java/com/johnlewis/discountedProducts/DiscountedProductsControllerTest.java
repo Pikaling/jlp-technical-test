@@ -42,9 +42,12 @@ public class DiscountedProductsControllerTest {
 
         when(mockProductsService.getProducts()).thenReturn(testProducts);
 
-        List<DiscountedProduct> discountedProducts = controller.getProducts(null);
+        DiscountedProducts discountedProducts = controller.getProducts(null);
         assertThat(discountedProducts).isNotNull();
-        assertThat(discountedProducts.size()).isEqualTo(1);
+
+        List<DiscountedProduct> products = discountedProducts.getProducts();
+        assertThat(products).isNotNull();
+        assertThat(products.size()).isEqualTo(1);
     }
 
 }

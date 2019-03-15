@@ -22,8 +22,8 @@ public class DiscountedProductsController {
     @Autowired
     private ProductMapper productMapper;
 
-    @RequestMapping(value="/products", method=GET)
-    public List<DiscountedProduct> getProducts(@RequestParam(value="labelType", defaultValue = DEFAULT_LABEL_TYPE) String labelType) {
+    @RequestMapping(value="/products", method=GET, produces = "applcation/json")
+    public DiscountedProducts getProducts(@RequestParam(value="labelType", defaultValue = DEFAULT_LABEL_TYPE) String labelType) {
         List<Product> products = productsService.getProducts();
         List<DiscountedProduct> discountedProducts = new ArrayList<>();
         for (Product product : products) {
@@ -31,6 +31,6 @@ public class DiscountedProductsController {
                 discountedProducts.add(productMapper.toDiscountedProduct(product, labelType));
             }
         }
-        return discountedProducts;
+        return new DiscountedProducts(discountedProducts);
     }
 }
